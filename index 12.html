@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <!-- user-scalable=no impede o zoom automático indesejado ao interagir com inputs e textareas -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Despachante C&M - Soluções Documentais Inteligentes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #0b0b14;
+            color: #e2e8f0;
+        }
+        .heading-font {
+            font-family: 'Rajdhani', sans-serif;
+        }
+        .neon-border {
+            box-shadow: 0 0 15px rgba(147, 51, 234, 0.15), inset 0 0 15px rgba(147, 51, 234, 0.05);
+            border: 1px solid rgba(147, 51, 234, 0.3);
+        }
+        .neon-border:hover {
+            box-shadow: 0 0 25px rgba(34, 197, 94, 0.25), inset 0 0 10px rgba(34, 197, 94, 0.05);
+            border: 1px solid rgba(34, 197, 94, 0.5);
+        }
+        .glass-card {
+            background: rgba(20, 20, 35, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .glass-sidebar {
+            background: rgba(11, 11, 20, 0.96);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0b14;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #9333ea;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #22c55e;
+        }
+        .sidebar-transition {
+            transition: transform 0.3s ease-in-out;
+        }
+        /* Força os inputs a manterem tamanho padrão para evitar gatilhos de zoom em browsers móveis */
+        input, textarea, select {
+            font-size: 16px !important;
+        }
+        @media (min-width: 640px) {
+            input, textarea, select {
+                font-size: 14px !important;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between antialiased overflow-x-hidden">
+
+    <!-- Navegação / Header -->
+    <header class="glass-card border-b border-purple-900/40 sticky top-0 z-40 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+
+            <!-- Identidade Avançada do Topo -->
+            <div class="flex items-center gap-2 group">
+                <div class="relative flex items-center gap-2">
+                    <div class="absolute -left-2 w-10 h-10 bg-purple-500/20 rounded-full blur-lg group-hover:bg-green-500/20 transition-all"></div>
+                    <i class="fas fa-shield-car text-xl text-purple-500 group-hover:text-green-400 transition-colors"></i>
+                    <div class="text-2xl sm:text-3xl font-extrabold heading-font tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-indigo-400 to-green-400">
+                        DESPACHANTE C&M
+                    </div>
+                </div>
+                <span class="inline-flex items-center justify-center bg-blue-500/20 text-blue-400 rounded-full p-1 text-xs border border-blue-500/30 shadow-lg shadow-blue-500/10" title="Conta Oficial Verificada">
+                    <i class="fas fa-circle-check text-[10px]"></i>
+                </span>
+            </div>
+
+            <!-- Navegação Desktop -->
+            <nav class="hidden lg:flex items-center gap-6">
+                <a href="#catalogo" class="text-sm font-medium text-gray-300 hover:text-green-400 transition flex items-center gap-1.5"><i class="fas fa-boxes-stacked"></i> Catálogo</a>
+                <a href="#depoimentos" class="text-sm font-medium text-gray-300 hover:text-green-400 transition flex items-center gap-1.5"><i class="fas fa-star"></i> Avaliações</a>
+                <a href="#faq" class="text-sm font-medium text-gray-300 hover:text-green-400 transition flex items-center gap-1.5"><i class="fas fa-circle-question"></i> Dúvidas</a>
+                <button onclick="abrirModalFeedback()" class="text-sm font-medium text-gray-300 hover:text-green-400 transition flex items-center gap-1.5"><i class="fas fa-comments"></i> Ver Feedback</button>
+            </nav>
+
+            <!-- Ações Header (Carrinho e Hambúrguer) -->
+            <div class="flex items-center gap-3">
+                <!-- Botão Carrinho -->
+                <button onclick="toggleCarrinho()" class="relative bg-purple-950/40 border border-purple-500/30 p-2.5 rounded-lg text-purple-300 hover:text-green-400 hover:border-green-500/40 transition flex items-center justify-center">
+                    <i class="fas fa-cart-shopping"></i>
+                    <span id="carrinhoContador" class="absolute -top-1.5 -right-1.5 bg-green-500 text-slate-950 text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border border-slate-950">0</span>
+                </button>
+
+                <!-- Status Online -->
+                <span class="hidden sm:flex bg-purple-900/40 text-purple-300 border border-purple-500/20 px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span> Online via Zap
+                </span>
+
+                <!-- Menu Hambúrguer -->
+                <button onclick="toggleMenuHamburguer()" class="lg:hidden bg-slate-900 border border-gray-800 p-2.5 rounded-lg text-gray-400 hover:text-white transition">
+                    <i id="iconeHamburguer" class="fas fa-bars text-lg"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Menu Hambúrguer Lateral -->
+    <div id="menuHamburguer" class="fixed inset-y-0 right-0 w-72 glass-sidebar border-l border-purple-900/40 z-50 transform translate-x-full sidebar-transition flex flex-col justify-between p-6 shadow-2xl">
+        <div class="space-y-6">
+            <div class="flex items-center justify-between border-b border-gray-800 pb-4">
+                <span class="font-bold heading-font uppercase tracking-wider text-purple-400 text-lg">Navegação</span>
+                <button onclick="toggleMenuHamburguer()" class="text-gray-400 hover:text-white"><i class="fas fa-xmark text-lg"></i></button>
+            </div>
+            <nav class="flex flex-col gap-4">
+                <a href="#catalogo" onclick="toggleMenuHamburguer()" class="text-gray-300 hover:text-green-400 font-medium py-2 flex items-center gap-2"><i class="fas fa-boxes-stacked w-5"></i> Catálogo</a>
+                <a href="#depoimentos" onclick="toggleMenuHamburguer()" class="text-gray-300 hover:text-green-400 font-medium py-2 flex items-center gap-2"><i class="fas fa-star w-5"></i> Avaliações</a>
+                <a href="#faq" onclick="toggleMenuHamburguer()" class="text-gray-300 hover:text-green-400 font-medium py-2 flex items-center gap-2"><i class="fas fa-circle-question w-5"></i> Dúvidas</a>
+                <button onclick="toggleMenuHamburguer(); abrirModalFeedback();" class="text-left text-gray-300 hover:text-green-400 font-medium py-2 flex items-center gap-2 w-full"><i class="fas fa-comments w-5"></i> Ver Feedback</button>
+            </nav>
+        </div>
+        <div class="border-t border-gray-800 pt-4 space-y-3">
+            <span class="text-xs text-gray-500 uppercase font-bold block tracking-wider"><i class="fas fa-headset text-purple-500"></i> Canais de Suporte</span>
+            <a href="https://api.whatsapp.com/send?phone=5521967158557" target="_blank" class="w-full bg-emerald-600/20 hover:bg-emerald-600 border border-emerald-500/30 text-emerald-400 hover:text-white font-bold py-2.5 px-4 rounded-lg text-sm flex items-center justify-center gap-2 transition">
+                <i class="fab fa-whatsapp"></i> Atendente Suporte 1
+            </a>
+            <a href="https://api.whatsapp.com/send?phone=5521967315297" target="_blank" class="w-full bg-emerald-600/20 hover:bg-emerald-600 border border-emerald-500/30 text-emerald-400 hover:text-white font-bold py-2.5 px-4 rounded-lg text-sm flex items-center justify-center gap-2 transition">
+                <i class="fab fa-whatsapp"></i> Atendente Suporte 2
+            </a>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="relative py-16 lg:py-24 overflow-hidden bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-900/20 via-slate-950 to-slate-950">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-300 text-xs font-medium mb-6">
+                <i class="fas fa-shield-halved text-green-400"></i> Emissões Documentais Sem Burocracia
+            </div>
+            <h1 class="text-4xl sm:text-6xl font-extrabold heading-font tracking-tight text-white mb-6 leading-tight">
+                Emissão de Documentos & <span class="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-500">Placas Automotivas</span>
+            </h1>
+            <p class="max-w-2xl mx-auto text-base sm:text-lg text-gray-400 mb-10">
+                Adquira emplacamentos regulamentados, segundas vias de documentos oficiais emitidos direto pelo Detran e consultas veiculares com suporte prioritário.
+            </p>
+            <div class="flex flex-wrap justify-center gap-4">
+                <a href="#catalogo" class="bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-500 hover:to-purple-700 text-white font-semibold px-8 py-3.5 rounded-lg shadow-lg shadow-purple-600/20 transition-all duration-300 flex items-center gap-2">
+                    <i class="fas fa-shopping-basket"></i> Ver Catálogo de Serviços
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Seção de Vantagens rápidas com informações de Logística atualizadas -->
+    <section class="border-y border-purple-950/40 bg-[#090910] py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 sm:grid-cols-3 gap-6 text-center sm:text-left">
+            <div class="flex flex-col sm:flex-row items-center gap-4 p-2">
+                <div class="w-12 h-12 rounded-xl bg-purple-600/10 border border-purple-500/20 flex items-center justify-center text-purple-400 text-xl flex-shrink-0"><i class="fas fa-bolt"></i></div>
+                <div><h4 class="font-bold text-white heading-font uppercase">Envio no Mesmo Dia</h4><p class="text-xs text-gray-500">Placas fabricadas e enviadas no mesmo dia.</p></div>
+            </div>
+            <div class="flex flex-col sm:flex-row items-center gap-4 p-2">
+                <div class="w-12 h-12 rounded-xl bg-green-600/10 border border-green-500/20 flex items-center justify-center text-green-400 text-xl flex-shrink-0"><i class="fas fa-motorcycle"></i></div>
+                <div><h4 class="font-bold text-white heading-font uppercase">Uber / 99 / Sedex</h4><p class="text-xs text-gray-500">Entrega local por App ou Sedex para outros estados.</p></div>
+            </div>
+            <div class="flex flex-col sm:flex-row items-center gap-4 p-2">
+                <div class="w-12 h-12 rounded-xl bg-blue-600/10 border border-green-500/20 flex items-center justify-center text-blue-400 text-xl flex-shrink-0"><i class="fas fa-file-pdf"></i></div>
+                <div><h4 class="font-bold text-white heading-font uppercase">Documento Digital por PDF</h4><p class="text-xs text-gray-500">Consultas e emissões digitais direto no WhatsApp.</p></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Catálogo Principal -->
+    <main id="catalogo" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 flex-grow w-full">
+
+        <!-- Barra de ferramentas do catálogo: Busca e Filtro -->
+        <div class="mb-10 space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between border-b border-gray-800 pb-6 gap-4">
+                <div>
+                    <h2 class="text-2xl sm:text-3xl font-bold heading-font uppercase tracking-wide text-white flex items-center gap-3">
+                        <i class="fas fa-store text-purple-500"></i> Nossos Serviços
+                    </h2>
+                    <p class="text-xs text-gray-500 mt-1">Selecione os produtos desejados e monte seu carrinho de compras dinâmico.</p>
+                </div>
+
+                <!-- Barra de pesquisa -->
+                <div class="relative w-full md:w-80">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500">
+                        <i class="fas fa-magnifying-glass"></i>
+                    </span>
+                    <input type="text" id="campoBusca" onkeyup="filtrarCatalogo()" placeholder="Procurar serviço..." class="w-full bg-slate-900 border border-gray-800 rounded-lg pl-10 pr-4 py-2 text-sm text-white focus:outline-none focus:border-purple-500 placeholder-gray-600 transition-all">
+                </div>
+            </div>
+
+            <!-- Botões de Categoria -->
+            <div class="flex flex-wrap gap-2" id="containerAbas">
+                <button onclick="filtrarCategoria('todos')" class="aba-filtro active bg-purple-600 text-white border border-transparent px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider transition-all">Todos</button>
+                <button onclick="filtrarCategoria('placas')" class="aba-filtro bg-slate-900 text-gray-400 hover:text-white border border-gray-800 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider transition-all">Placas</button>
+                <button onclick="filtrarCategoria('documentos')" class="aba-filtro bg-slate-900 text-gray-400 hover:text-white border border-gray-800 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider transition-all">Documentos</button>
+                <button onclick="filtrarCategoria('consultas')" class="aba-filtro bg-slate-900 text-gray-400 hover:text-white border border-gray-800 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider transition-all">Consultas</button>
+            </div>
+        </div>
+
+        <!-- Grid de Produtos Melhorados -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="gridProdutos">
+
+            <!-- Card 1: Placa Antiga -->
+            <div class="product-card glass-card rounded-xl overflow-hidden neon-border flex flex-col justify-between transition-all duration-300" data-category="placas" data-name="placa antiga">
+                <div>
+                    <div class="relative h-56 w-full bg-slate-900 overflow-hidden group">
+                        <img src="https://i.postimg.cc/dtj3zKSC/IMG-4399.jpg" alt="Placa antiga" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <span class="absolute top-3 right-3 bg-purple-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-md uppercase tracking-wider">Item Físico</span>
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-xl font-bold heading-font text-white mb-2">Placa Antiga Cinza (Tradicional)</h3>
+                        <p class="text-sm text-gray-400 mb-4 leading-relaxed">Confeccionada rigorosamente nos moldes tradicionais de época. Ideal para reposição estrutural ou processos de restaurações e colecionadores. Estampagem sob demanda com chapa reforçada.</p>
+
+                        <div class="space-y-1.5 border-t border-gray-800/60 pt-3 text-xs text-gray-400">
+                            <div class="flex items-center gap-2"><i class="fas fa-circle-check text-purple-500"></i> Chapa de alumínio industrial de alta durabilidade</div>
+                            <div class="flex items-center gap-2"><i class="fas fa-circle-check text-purple-500"></i> Tarjeta customizada de acordo com seu município</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-5 pt-0">
+                    <div class="flex items-baseline justify-between mb-4">
+                        <span class="text-xs text-gray-400 uppercase font-medium">Preço Unitário</span>
+                        <span class="text-2xl font-bold text-green-400 heading-font">R$ 200,00</span>
+                    </div>
+                    <button onclick="adicionarAoCarrinho('Placa Antiga Cinza', 200)" class="w-full bg-purple-700 hover:bg-purple-600 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition shadow-lg">
+                        <i class="fas fa-cart-plus"></i> Adicionar ao Carrinho
+                    </button>
+                </div>
+            </div>
+
+            <!-- Card 2: Placa Refletiva Carro/Moto -->
+            <div class="product-card glass-card rounded-xl overflow-hidden neon-border flex flex-col justify-between transition-all duration-300" data-category="placas" data-name="placa refletiva carro moto">
+                <div>
+                    <div class="relative h-56 w-full bg-slate-900 overflow-hidden group">
+                        <img src="https://i.postimg.cc/nr85Kgv2/IMG-4411.jpg" alt="Placa Refletiva" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <span class="absolute top-3 right-3 bg-purple-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-md uppercase tracking-wider">Item Físico</span>
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-xl font-bold heading-font text-white mb-2">Placa Refletiva (Carro / Moto)</h3>
+                        <p class="text-sm text-gray-400 mb-4 leading-relaxed">Película refletiva de alta performance e visibilidade industrial. Perfeita conformidade para reposições estruturais em Carros ou Motos, garantindo durabilidade contra intempéries climáticas.</p>
+
+                        <div class="space-y-1.5 border-t border-gray-800/60 pt-3 text-xs text-gray-400">
+                            <div class="flex items-center gap-2"><i class="fas fa-circle-check text-purple-500"></i> Homologada com refletivo prismático de alta performance</div>
+                            <div class="flex items-center gap-2"><i class="fas fa-circle-check text-purple-500"></i> Disponível sob medida tanto para carros quanto motos</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-5 pt-0">
+                    <div class="flex items-baseline justify-between mb-4">
+                        <span class="text-xs text-gray-400 uppercase font-medium">Preço Unitário</span>
+                        <span class="text-2xl font-bold text-green-400 heading-font">R$ 250,00</span>
+                    </div>
+                    <button onclick="adicionarAoCarrinho('Placa Refletiva (Carro/Moto)', 250)" class="w-full bg-purple-700 hover:bg-purple-600 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition shadow-lg">
+                        <i class="fas fa-cart-plus"></i> Adicionar ao Carrinho
+                    </button>
+                </div>
+            </div>
+
+            <!-- CARD NOVO: Placa Mercosul Vermelha Comercial -->
+            <div class="product-card glass-card rounded-xl overflow-hidden neon-border flex flex-col justify-between transition-all duration-300" data-category="placas" data-name="placa mercosul vermelha carro moto comercial">
+                <div>
+                    <div class="relative h-56 w-full bg-slate-900 overflow-hidden group">
+                        <img src="https://i.postimg.cc/sf6GXz4m/IMG-4417.jpg" alt="Placa Mercosul Vermelha" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <span class="absolute top-3 right-3 bg-red-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-md uppercase tracking-wider">Comercial / Aprendizagem</span>
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-xl font-bold heading-font text-white mb-2">Placa Mercosul Vermelha (Carro / Moto)</h3>
+                        <p class="text-sm text-gray-400 mb-4 leading-relaxed">Modelo oficial regulamentado em padrão Mercosul com fundo vermelho e caracteres brancos. Destinado a veículos de aluguel, transporte público, comerciais, autônomos ou autoescolas.</p>
+
+                        <div class="space-y-1.5 border-t border-gray-800/60 pt-3 text-xs text-gray-400">
+                            <div class="flex items-center gap-2"><i class="fas fa-circle-check text-red-500"></i> Estampagem digital de alta precisão com película refletiva oficial</div>
+                            <div class="flex items-center gap-2"><i class="fas fa-circle-check text-red-500"></i> QR Code de segurança integrado e rastreável nos sistemas nacionais</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-5 pt-0">
+                    <div class="flex items-baseline justify-between mb-4">
+                        <span class="text-xs text-gray-400 uppercase font-medium">Preço Unitário</span>
+                        <span class="text-2xl font-bold text-green-400 heading-font">R$ 250,00</span>
+                    </div>
+                    <button onclick="adicionarAoCarrinho('Placa Mercosul Vermelha (Carro/Moto)', 250)" class="w-full bg-purple-700 hover:bg-purple-600 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition shadow-lg">
+                        <i class="fas fa-cart-plus"></i> Adicionar ao Carrinho
+                    </button>
+                </div>
+            </div>
+
+            <!-- Card 2: CRV Original -->
+            <div class="product-card glass-card rounded-xl overflow-hidden neon-border flex flex-col justify-between transition-all duration-300" data-category="documentos" data-name="crv certificado registro veiculo original">
+                <div>
+                    <div class="relative h-56 w-full bg-slate-900 overflow-hidden group">
+                        <img src="https://i.postimg.cc/MTBKtkQG/IMG-4401.jpg" alt="CRV Original" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <span class="absolute top-3 right-3 bg-blue-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-md uppercase tracking-wider">Original Oficial</span>
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-xl font-bold heading-font text-white mb-2">CRV (Certificado de Registro de Veículo)</h3>
+                        <p class="text-sm text-gray-400 mb-4 leading-relaxed">Emissão física oficial do documento de compra, venda e transferência de propriedade. Válido e homologado para qualquer estado nacional, retirado diretamente do fluxo interno operacional.</p>
+
+                        <div class="space-y-1.5 border-t border-gray-800/60 pt-3 text-xs text-gray-400">
+                            <div class="flex items-center gap-2"><i class="fas fa-circle-check text-blue-500"></i> Papel-moeda oficial com marcas d'água regulamentadas</div>
+                            <div class="flex items-center gap-2"><i class="fas fa-circle-check text-blue-500"></i> Pronto para procedimentos de reconhecimento em cartório</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-5 pt-0">
+                    <div class="flex items-baseline justify-between mb-4">
+                        <span class="text-xs text-gray-400 uppercase font-medium">Preço Unitário</span>
+                        <span class="text-2xl font-bold text-green-400 heading-font">R$ 50,00</span>
+                    </div>
+                    <button onclick="adicionarAoCarrinho('CRV Original', 50)" class="w-full bg-purple-700 hover:bg-purple-600 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition shadow-lg">
+                        <i class="fas fa-cart-plus"></i> Adicionar ao Carrinho
+                    </button>
+                </div>
+            </div>
+
+            <!-- Card 3: CRLV Original -->
+            <div class="product-card glass-card rounded-xl overflow-hidden neon-border flex flex-col justify-between transition-all duration-300" data-category="documentos" data-name="crlv original licenciamento">
+                <div>
+                    <div class="relative h-56 w-full bg-slate-900 overflow-hidden group">
+                        <img src="https://i.postimg.cc/7hyPWB3f/IMG-4402.jpg" alt="CRLV Original" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <span class="absolute top-3 right-3 bg-blue-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-md uppercase tracking-wider">Original Físico</span>
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-xl font-bold heading-font text-white mb-2">CRLV Original (Licenciamento Anual)</h3>
+                        <p class="text-sm text-gray-400 mb-4 leading-relaxed">Emissão do Certificado de Licenciamento Anual em formato físico regulamentado. Item indispensável para circular com total segurança jurídica e evitar apreensões perante blitze.</p>
+
+                        <div class="space-y-1.5 border-t border-gray-800/60 pt-3 text-xs text-gray-400">
+                            <div class="flex items-center gap-2"><i class="fas fa-circle-check text-blue-500"></i> Impressão de altíssima definição e legibilidade total</div>
+                            <div class="flex items-center gap-2"><i class="fas fa-circle-check text-blue-500"></i> Atualizado na base sistêmica de acordo com o ano vigente</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-5 pt-0">
+                    <div class="flex items-baseline justify-between mb-4">
+                        <span class="text-xs text-gray-400 uppercase font-medium">Preço Unitário</span>
+                        <span class="text-2xl font-bold text-green-400 heading-font">R$ 100,00</span>
+                    </div>
+                    <button onclick="adicionarAoCarrinho('CRLV Original', 100)" class="w-full bg-purple-700 hover:bg-purple-600 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition shadow-lg">
+                        <i class="fas fa-cart-plus"></i> Adicionar ao Carrinho
+                    </button>
+                </div>
+            </div>
+
+            <!-- Card 4: Puxada de Motor -->
+            <div class="product-card glass-card rounded-xl overflow-hidden neon-border flex flex-col justify-between transition-all duration-300" data-category="consultas" data-name="puxada completa de motor historico">
+                <div>
+                    <div class="relative h-56 w-full bg-slate-900 overflow-hidden group">
+                        <img src="https://i.postimg.cc/7PgZ2k4V/IMG-4403.jpg" alt="Puxada completa" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <span class="absolute top-3 right-3 bg-amber-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-md uppercase tracking-wider">Acesso Digital</span>
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-xl font-bold heading-font text-white mb-2">Puxada Completa de Motor</h3>
+                        <p class="text-sm text-gray-400 mb-4 leading-relaxed">Dossiê investigativo de dados estruturados cruzando a numeração física gravada no bloco do motor com a base de dados nacional. Indispensável para vistorias, leilões ou repasses seguros.</p>
+
+                        <div class="space-y-1.5 border-t border-gray-800/60 pt-3 text-xs text-gray-400">
+                            <div class="flex items-center gap-2"><i class="fas fa-circle-check text-amber-500"></i> Envio prioritário em formato PDF direto no seu WhatsApp</div>
+                            <div class="flex items-center gap-2"><i class="fas fa-circle-check text-amber-500"></i> Alerta detalhado de restrições ou fraudes industriais</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-5 pt-0">
+                    <div class="flex items-baseline justify-between mb-4">
+                        <span class="text-xs text-gray-400 uppercase font-medium">Preço Unitário</span>
+                        <span class="text-2xl font-bold text-green-400 heading-font">R$ 50,00</span>
+                    </div>
+                    <button onclick="adicionarAoCarrinho('Puxada Completa de Motor', 50)" class="w-full bg-purple-700 hover:bg-purple-600 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition shadow-lg">
+                        <i class="fas fa-cart-plus"></i> Adicionar ao Carrinho
+                    </button>
+                </div>
+            </div>
+
+            <!-- Card 5: Placa Mercosul com Seleção Dinâmica -->
+            <div class="product-card glass-card rounded-xl overflow-hidden neon-border flex flex-col justify-between transition-all duration-300" data-category="placas" data-name="placa mercosul de carro par avulsa">
+                <div>
+                    <div class="relative h-56 w-full bg-slate-900 overflow-hidden group">
+                        <img src="https://i.postimg.cc/28r8dK8z/IMG-4404.jpg" alt="Placa Mercosul" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <span class="absolute top-3 right-3 bg-purple-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-md uppercase tracking-wider">Estampagem Premium</span>
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-xl font-bold heading-font text-white mb-2">Placa Mercosul de Carro</h3>
+
+                        <!-- Seletor de Opção de Compra In-Card -->
+                        <div class="grid grid-cols-2 gap-2 my-3">
+                            <button id="btnMercosulUnidade" onclick="selecionarOpcaoMercosul('unidade')" class="py-1.5 px-2 text-xs rounded-md bg-purple-600 text-white font-bold transition">1 Unidade (R$250)</button>
+                            <button id="btnMercosulPar" onclick="selecionarOpcaoMercosul('par')" class="py-1.5 px-2 text-xs rounded-md bg-slate-800 text-gray-400 font-medium transition">O Par (R$450)</button>
+                        </div>
+
+                        <!-- Descrições que alteram dinamicamente -->
+                        <p id="descricaoMercosul" class="text-sm text-gray-400 mb-4 min-h-[60px] leading-relaxed">
+                            Ideal para substituição unitária (traseira ou dianteira afetada). Inclui película refletiva homologada de alta durabilidade e QR Code regulamentado funcional.
+                        </p>
+
+                        <div class="space-y-1.5 border-t border-gray-800/60 pt-3 text-xs text-gray-400">
+                            <div class="flex items-center gap-2"><i class="fas fa-circle-check text-purple-500"></i> Película reflexiva prismática com homologação oficial</div>
+                            <div class="flex items-center gap-2"><i class="fas fa-circle-check text-purple-500"></i> Processamento rápido alinhado às normas federais</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-5 pt-0">
+                    <div class="flex items-baseline justify-between mb-4">
+                        <span class="text-xs text-gray-400 uppercase font-medium">Preço Selecionado</span>
+                        <span id="precoMercosulTexto" class="text-2xl font-bold text-green-400 heading-font">R$ 250,00</span>
+                    </div>
+                    <button onclick="adicionarMercosulAoCarrinho()" class="w-full bg-purple-700 hover:bg-purple-600 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition shadow-lg">
+                        <i class="fas fa-cart-plus"></i> Adicionar ao Carrinho
+                    </button>
+                </div>
+            </div>
+
+            <!-- Card 6: Doc Verde Detran -->
+            <div class="product-card glass-card rounded-xl overflow-hidden neon-border flex flex-col justify-between transition-all duration-300" data-category="documentos" data-name="doc verde ou recibo original detran">
+                <div>
+                    <div class="relative h-56 w-full bg-slate-900 overflow-hidden group">
+                        <img src="https://i.postimg.cc/DZ1nLq9b/IMG-4407.jpg" alt="Doc Verde Detran" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <span class="absolute top-3 right-3 bg-red-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-md uppercase tracking-wider">Emissão Detran</span>
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-xl font-bold heading-font text-white mb-2">Doc Verde / Recibo Original</h3>
+                        <p class="text-sm text-gray-400 mb-4 leading-relaxed">Retirada física oficial de fluxo do documento verde tradicional ou Recibo de Compra/Venda direto das repartições do Detran. Solução voltada para regularizações complexas de cadastro.</p>
+
+                        <div class="space-y-1.5 border-t border-gray-800/60 pt-3 text-xs text-gray-400">
+                            <div class="flex items-center gap-2"><i class="fas fa-circle-check text-red-500"></i> Autenticidade garantida e rastreada via base nacional</div>
+                            <div class="flex items-center gap-2"><i class="fas fa-circle-check text-red-500"></i> Liberação processada sem necessidade de agendamentos</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-5 pt-0">
+                    <div class="flex items-baseline justify-between mb-4">
+                        <span class="text-xs text-gray-400 uppercase font-medium">Preço Unitário</span>
+                        <span class="text-2xl font-bold text-green-400 heading-font">R$ 450,00</span>
+                    </div>
+                    <button onclick="adicionarAoCarrinho('Doc Verde / Recibo Original', 450)" class="w-full bg-purple-700 hover:bg-purple-600 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition shadow-lg">
+                        <i class="fas fa-cart-plus"></i> Adicionar ao Carrinho
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Sidebar Lateral do Carrinho Conectado -->
+    <div id="sidebarCarrinho" class="fixed inset-y-0 right-0 w-full sm:w-[440px] glass-sidebar border-l border-purple-500/30 z-50 transform translate-x-full sidebar-transition flex flex-col justify-between shadow-2xl">
+        <div class="p-6 border-b border-gray-800 flex items-center justify-between bg-purple-950/20">
+            <h3 class="text-lg font-bold heading-font uppercase tracking-wider text-white flex items-center gap-2">
+                <i class="fas fa-cart-shopping text-purple-500"></i> Seu Carrinho
+            </h3>
+            <button onclick="toggleCarrinho()" class="text-gray-400 hover:text-white transition"><i class="fas fa-xmark text-lg"></i></button>
+        </div>
+
+        <!-- Itens Renderizados -->
+        <div id="carrinhoItensContainer" class="p-6 flex-grow overflow-y-auto space-y-4">
+            <!-- Gerado via JavaScript -->
+        </div>
+
+        <!-- Rodapé e Sumarização do Carrinho -->
+        <div class="p-6 border-t border-gray-800 bg-slate-950/60 space-y-4">
+
+            <!-- Caixa de Alerta Rápido sobre Envio -->
+            <div class="bg-purple-950/30 border border-purple-900/50 p-3 rounded-lg text-[11px] text-gray-400 space-y-1">
+                <div class="text-purple-400 font-bold uppercase tracking-wider heading-font flex items-center gap-1">
+                    <i class="fas fa-truck-fast"></i> Diretrizes Rápidas de Logística:
+                </div>
+                <div>• *Locais Próximos:* Envio no mesmo dia via Moto Uber ou 99.</div>
+                <div>• *Placas:* Confeccionadas e despachadas no mesmo dia.</div>
+                <div>• *Outros Estados:* Envios prioritários através de Sedex.</div>
+                <div>• *Documentos Digitais:* Liberação imediata em arquivo PDF.</div>
+            </div>
+
+            <div class="flex items-center justify-between text-sm">
+                <span class="text-gray-400 font-medium">Subtotal Consolidado:</span>
+                <span id="carrinhoPrecoTotal" class="text-xl font-bold text-green-400 heading-font">R$ 0,00</span>
+            </div>
+
+            <div>
+                <label class="text-[10px] font-bold text-purple-400 uppercase tracking-wider block mb-1">Dados de Envio ou Placa/Renavam do Veículo</label>
+                <textarea id="carrinhoObservacoes" placeholder="Informe o endereço completo para envios físicos ou placa/renavam se for emissão/consulta digital." rows="2" class="w-full bg-slate-900 border border-purple-900/40 rounded-lg p-2.5 text-xs text-gray-200 placeholder-gray-600 focus:border-green-400 focus:outline-none resize-none"></textarea>
+            </div>
+
+            <div class="space-y-2">
+                <button onclick="abrirModalAtendente()" class="w-full bg-gradient-to-r from-green-600 to-emerald-500 hover:from-green-500 hover:to-emerald-400 text-slate-950 font-extrabold py-3 rounded-lg text-sm flex items-center justify-center gap-2 transition shadow-lg uppercase tracking-wider">
+                    <i class="fab fa-whatsapp text-lg"></i> Finalizar Pedido via WhatsApp
+                </button>
+                <button onclick="toggleCarrinho()" class="w-full bg-slate-900 hover:bg-slate-800 border border-gray-800 text-gray-300 font-semibold py-2.5 rounded-lg text-xs text-center transition tracking-wide uppercase">
+                    <i class="fas fa-arrow-left text-[10px] mr-1"></i> Continuar Comprando
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Avançado de Feedback (Imagens e Solicitações) -->
+    <div id="modalFeedback" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-card border border-purple-500/40 rounded-xl w-full max-w-md overflow-hidden transition-all transform duration-300">
+            <div class="bg-purple-950/40 p-4 border-b border-purple-900/40 flex items-center justify-between">
+                <h3 class="text-md font-bold heading-font tracking-wide text-white flex items-center gap-2">
+                    <i class="fas fa-comments text-green-400"></i> Histórico de Feedbacks
+                </h3>
+                <button onclick="fecharModalFeedback()" class="text-gray-400 hover:text-white transition"><i class="fas fa-xmark text-lg"></i></button>
+            </div>
+            <div class="p-5 space-y-4 text-center">
+                <div class="border border-purple-500/20 rounded-lg overflow-hidden bg-slate-950">
+                    <img src="https://i.postimg.cc/Y9NNVPck/IMG-4410.jpg" alt="Feedback dos Clientes" class="w-full h-auto object-cover max-h-72 sm:max-h-96">
+                </div>
+                <p class="text-xs text-gray-400">Garantia absoluta de integridade e satisfação em todos os serviços realizados.</p>
+                <div class="grid grid-cols-1 gap-2 pt-2">
+                    <button onclick="solicitarMaisFeedbacks()" class="w-full bg-gradient-to-r from-emerald-600 to-green-500 hover:from-emerald-500 hover:to-green-400 text-slate-950 font-extrabold py-3 rounded-lg text-xs uppercase tracking-wider flex items-center justify-center gap-2">
+                        <i class="fab fa-whatsapp text-sm"></i> Continuar e Solicitar Mais Feedbacks
+                    </button>
+                    <button onclick="fecharModalFeedback()" class="w-full bg-slate-900 hover:bg-slate-800 border border-gray-800 text-gray-400 text-xs py-2 rounded-lg font-medium transition">
+                        Voltar para a Loja
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Atendentes Plantonistas -->
+    <div id="modalAtendente" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-card border border-purple-500/40 rounded-xl w-full max-w-md overflow-hidden transition-all transform duration-300">
+            <div class="bg-purple-950/40 p-4 border-b border-purple-900/40 flex items-center justify-between">
+                <h3 class="text-md font-bold heading-font tracking-wide text-white flex items-center gap-2">
+                    <i class="fas fa-headset text-green-400"></i> Selecione um Atendente
+                </h3>
+                <button onclick="fecharModalAtendente()" class="text-gray-400 hover:text-white transition"><i class="fas fa-xmark"></i></button>
+            </div>
+            <div class="p-5 space-y-3">
+                <p class="text-xs text-gray-400 mb-2">Seu pedido foi processado pelo carrinho de compras. Escolha um canal operacional para enviar os dados estruturados:</p>
+                <button onclick="concluirPedidoWhatsApp('+5521967158557')" class="w-full bg-gradient-to-r from-emerald-600 to-green-600 text-white font-bold py-3 px-4 rounded-lg text-sm flex items-center justify-center gap-2 transition shadow-md">
+                    <i class="fab fa-whatsapp"></i> Central de Emissão - Canal 1
+                </button>
+                <button onclick="concluirPedidoWhatsApp('+5521967315297')" class="w-full bg-gradient-to-r from-emerald-600 to-green-600 text-white font-bold py-3 px-4 rounded-lg text-sm flex items-center justify-center gap-2 transition shadow-md">
+                    <i class="fab fa-whatsapp"></i> Central de Emissão - Canal 2
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Depoimentos / Feedback -->
+    <section id="depoimentos" class="bg-[#07070d] py-16 border-t border-purple-950/40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-2xl sm:text-3xl font-bold heading-font uppercase text-white tracking-wide">Quem Compra, Confia</h2>
+                <p class="text-sm text-gray-500 mt-2">Depoimentos reais de clientes que regularizaram seus veículos conosco</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="glass-card p-6 rounded-xl border border-gray-800">
+                    <div class="flex items-center gap-1 text-amber-400 mb-3">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p class="text-sm text-gray-400 italic mb-4">"Precisei da segunda via do CRLV do meu carro bem antigo e o pessoal resolveu em menos de 24 horas. Nota 10!"</p>
+                    <div class="text-xs font-bold text-white uppercase heading-font">— Marcos S., São Paulo</div>
+                </div>
+                <div class="glass-card p-6 rounded-xl border border-gray-800">
+                    <div class="flex items-center gap-1 text-amber-400 mb-3">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p class="text-sm text-gray-400 italic mb-4">"Comprei o par de placas Mercosul. O desconto no par foi excelente e a entrega chegou perfeitamente embalada."</p>
+                    <div class="text-xs font-bold text-white uppercase heading-font">— Ricardo M., Rio de Janeiro</div>
+                </div>
+                <div class="glass-card p-6 rounded-xl border border-gray-800">
+                    <div class="flex items-center gap-1 text-amber-400 mb-3">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p class="text-sm text-gray-400 italic mb-4">"A puxada de motor salvou minha compra em um leilão. Dados minuciosos e suporte super atencioso pelo WhatsApp."</p>
+                    <div class="text-xs font-bold text-white uppercase heading-font">— Carla T., Minas Gerais</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Seção FAQ -->
+    <section id="faq" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 w-full">
+        <div class="text-center mb-10">
+            <h2 class="text-2xl sm:text-3xl font-bold heading-font uppercase text-white tracking-wide">Perguntas Frequentes</h2>
+            <p class="text-sm text-gray-500 mt-1">Esclareça suas dúvidas instantaneamente</p>
+        </div>
+        <div class="space-y-4">
+            <div class="glass-card border border-gray-800 rounded-lg overflow-hidden">
+                <button onclick="toggleFaq(this)" class="w-full text-left px-6 py-4 font-medium text-white flex justify-between items-center hover:bg-white/5 transition">
+                    <span>Vocês entregam em quais localidades e qual o prazo?</span>
+                    <i class="fas fa-chevron-down text-gray-500 text-xs transition-transform duration-300"></i>
+                </button>
+                <div class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-900/40">
+                    <p class="p-6 text-sm text-gray-400 leading-relaxed">As placas físicas encomendadas são produzidas e **despachadas no mesmo dia**! Para locais próximos dentro do Rio de Janeiro, enviamos imediatamente via Moto Uber ou 99. Para outros estados, os envios são efetuados de forma prioritária via Sedex.</p>
+                </div>
+            </div>
+            <div class="glass-card border border-gray-800 rounded-lg overflow-hidden">
+                <button onclick="toggleFaq(this)" class="w-full text-left px-6 py-4 font-medium text-white flex justify-between items-center hover:bg-white/5 transition">
+                    <span>Como funciona a entrega de documentos e consultas?</span>
+                    <i class="fas fa-chevron-down text-gray-500 text-xs transition-transform duration-300"></i>
+                </button>
+                <div class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-900/40">
+                    <p class="p-6 text-sm text-gray-400 leading-relaxed">Toda a parte de consultas veiculares estruturadas e documentações digitais possui envio imediato de forma desmaterializada. Assim que os dados são processados em nosso sistema, o documento digital é enviado diretamente no seu WhatsApp em formato PDF.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Rodapé -->
+    <footer class="bg-[#07070d] border-t border-purple-950/60 py-6 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
+            <div>
+                &copy; 2026 <span class="text-gray-400 font-medium heading-font tracking-wider">DESPACHANTE C&M</span>. Todos os direitos reservados.
+            </div>
+            <div class="flex gap-4 text-xs">
+                <span class="flex items-center gap-1"><i class="fas fa-shield-halved text-purple-500"></i> Ambiente Seguro</span>
+                <span class="flex items-center gap-1"><i class="fas fa-bolt text-green-400"></i> Entrega Expressa</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Lógica de Estado e Persistência Nativa (JavaScript) -->
+    <script>
+        // Inicialização do estado do carrinho com recuperação automática via LocalStorage (Anti-F5)
+        let carrinho = JSON.parse(localStorage.getItem('cm_despachante_cart')) || [];
+
+        // Estado local para o card dinâmico da Placa Mercosul Azul
+        let mercosulOpcaoSelecionada = 'unidade';
+        let mercosulPrecoAtual = 250;
+
+        // Ao carregar a página, renderiza o estado salvado no cache
+        document.addEventListener('DOMContentLoaded', () => {
+            atualizarInterfaceCarrinho();
+        });
+
+        // Alternadores de menus e abas
+        function toggleCarrinho() {
+            document.getElementById('sidebarCarrinho').classList.toggle('translate-x-full');
+        }
+
+        function toggleMenuHamburguer() {
+            const menu = document.getElementById('menuHamburguer');
+            const icone = document.getElementById('iconeHamburguer');
+            menu.classList.toggle('translate-x-full');
+            icone.className = menu.classList.contains('translate-x-full') ? "fas fa-bars text-lg" : "fas fa-xmark text-lg";
+        }
+
+        // Sistema de Controle do Modal de Feedback Integrado
+        function abrirModalFeedback() {
+            document.getElementById('modalFeedback').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function fecharModalFeedback() {
+            document.getElementById('modalFeedback').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function solicitarMaisFeedbacks() {
+            const mensagem = "Gostaria de ver feedback do seu trabalho";
+            const url = `https://api.whatsapp.com/send?phone=5521967158557&text=${encodeURIComponent(mensagem)}`;
+            window.open(url, '_blank');
+            fecharModalFeedback();
+        }
+
+        // Controle de alteração dinâmica da Placa Mercosul (Padrão Particular) dentro do Card
+        function selecionarOpcaoMercosul(opcao) {
+            const btnUnidade = document.getElementById('btnMercosulUnidade');
+            const btnPar = document.getElementById('btnMercosulPar');
+            const desc = document.getElementById('descricaoMercosul');
+            const precoTexto = document.getElementById('precoMercosulTexto');
+
+            mercosulOpcaoSelecionada = opcao;
+
+            if (opcao === 'unidade') {
+                mercosulPrecoAtual = 250;
+                btnUnidade.className = "py-1.5 px-2 text-xs rounded-md bg-purple-600 text-white font-bold transition";
+                btnPar.className = "py-1.5 px-2 text-xs rounded-md bg-slate-800 text-gray-400 font-medium transition";
+                desc.innerText = "Ideal para substituição unitária (traseira ou dianteira afetada). Inclui película refletiva homologada de alta durabilidade e QR Code regulamentado funcional.";
+                precoTexto.innerText = "R$ 250,00";
+            } else {
+                mercosulPrecoAtual = 450;
+                btnUnidade.className = "py-1.5 px-2 text-xs rounded-md bg-slate-800 text-gray-400 font-medium transition";
+                btnPar.className = "py-1.5 px-2 text-xs rounded-md bg-purple-600 text-white font-bold transition";
+                desc.innerText = "Combo completo contendo o Par de Placas Oficial (Dianteira + Traseira). Solução econômica integrada para regularização veicular completa com descontos progressivos.";
+                precoTexto.innerText = "R$ 450,00";
+            }
+        }
+
+        // Adicionar Placa Mercosul respeitando a opção do card
+        function adicionarMercosulAoCarrinho() {
+            const nomeItem = mercosulOpcaoSelecionada === 'unidade' ? 'Placa Mercosul (Unitária)' : 'Placa Mercosul (O Par)';
+            adicionarAoCarrinho(nomeItem, mercosulPrecoAtual);
+        }
+
+        // Adicionar itens gerais ao Carrinho
+        function adicionarAoCarrinho(nome, precoUnitario) {
+            const itemExistente = carrinho.find(item => item.nome === nome);
+
+            if (itemExistente) {
+                itemExistente.quantidade += 1;
+            } else {
+                carrinho.push({
+                    nome: nome,
+                    precoUnitario: precoUnitario,
+                    quantidade: 1
+                });
+            }
+
+            persistirCarrinho();
+            document.getElementById('sidebarCarrinho').classList.remove('translate-x-full');
+        }
+
+        function alterarQuantidade(nome, novaQtd) {
+            const item = carrinho.find(item => item.nome === nome);
+            if (item) {
+                item.quantidade = parseInt(novaQtd) || 1;
+                if(item.quantidade < 1) item.quantidade = 1;
+            }
+            persistirCarrinho();
+        }
+
+        function removerDoCarrinho(nome) {
+            carrinho = carrinho.filter(item => item.nome !== nome);
+            persistirCarrinho();
+        }
+
+        // Salvar estado e atualizar a visualização (LocalStorage Ativo)
+        function persistirCarrinho() {
+            localStorage.setItem('cm_despachante_cart', JSON.stringify(carrinho));
+            atualizarInterfaceCarrinho();
+        }
+
+        function atualizarInterfaceCarrinho() {
+            const container = document.getElementById('carrinhoItensContainer');
+            const contador = document.getElementById('carrinhoContador');
+            const subtotalTexto = document.getElementById('carrinhoPrecoTotal');
+
+            const totalItens = carrinho.reduce((sum, item) => sum + item.quantidade, 0);
+            contador.innerText = totalItens;
+
+            if (carrinho.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-gray-500 py-10">
+                        <i class="fas fa-basket-shopping text-3xl mb-3 block text-gray-600"></i>
+                        Seu carrinho está vazio.
+                    </div>`;
+                subtotalTexto.innerText = "R$ 0,00";
+                return;
+            }
+
+            let htmlAcumulado = '';
+            let subtotalGeral = 0;
+
+            carrinho.forEach(item => {
+                const valorCalculado = item.precoUnitario * item.quantidade;
+                subtotalGeral += valorCalculado;
+
+                htmlAcumulado += `
+                    <div class="bg-slate-900/60 border border-gray-800 p-3 rounded-lg flex items-center justify-between gap-3">
+                        <div class="flex-grow">
+                            <h4 class="text-xs font-bold text-white uppercase tracking-wide leading-tight">${item.nome}</h4>
+                            <span class="text-xs text-green-400 font-bold heading-font mt-1 block">R$ ${valorCalculado.toFixed(2).replace('.', ',')}</span>
+                        </div>
+                        <div class="flex items-center gap-2 flex-shrink-0">
+                            <input type="number" value="${item.quantidade}" min="1" oninput="alterarQuantidade('${item.nome}', this.value)" class="w-12 bg-slate-950 border border-purple-900/50 rounded p-1 text-center font-bold text-xs text-white focus:outline-none focus:border-green-400">
+                            <button onclick="removerDoCarrinho('${item.nome}')" class="text-red-500 hover:text-red-400 p-1 text-sm"><i class="fas fa-trash-can"></i></button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = htmlAcumulado;
+            subtotalTexto.innerText = `R$ ${subtotalGeral.toFixed(2).replace('.', ',')}`;
+        }
+
+        // Fechamento de Pedidos Unificados
+        function abrirModalAtendente() {
+            if(carrinho.length === 0) {
+                alert("Por favor, adicione serviços ao carrinho antes de finalizar!");
+                return;
+            }
+            document.getElementById('modalAtendente').classList.remove('hidden');
+        }
+
+        function fecharModalAtendente() {
+            document.getElementById('modalAtendente').classList.add('hidden');
+        }
+
+        // Envio estruturado via WhatsApp com dados de envio integrados à mensagem
+        function concluirPedidoWhatsApp(numeroWhatsapp) {
+            const observacoes = document.getElementById('carrinhoObservacoes').value.trim();
+            const totalTexto = document.getElementById('carrinhoPrecoTotal').innerText;
+
+            let mensagem = `Olá, gostaria de solicitar os seguintes serviços do carrinho:\n\n`;
+            carrinho.forEach(item => {
+                mensagem += `📦 *${item.nome}* - Quantidade: ${item.quantidade}\n`;
+            });
+            mensagem += `\n💰 *Valor Total:* ${totalTexto}\n`;
+
+            if(observacoes !== '') {
+                mensagem += `📍 *Dados/Endereço para entrega:* ${observacoes}\n`;
+            } else {
+                mensagem += `📍 *Dados do Veículo / Endereço:* A combinar com o consultor\n`;
+            }
+
+            const numeroLimpo = numeroWhatsapp.replace(/[^0-9]/g, '');
+            const url = `https://api.whatsapp.com/send?phone=${numeroLimpo}&text=${encodeURIComponent(mensagem)}`;
+
+            window.open(url, '_blank');
+            fecharModalAtendente();
+            toggleCarrinho();
+        }
+
+        // Filtros e ferramentas nativas de busca
+        function filtrarCategoria(categoria) {
+            const botoes = document.querySelectorAll('.aba-filtro');
+            botoes.forEach(btn => {
+                btn.classList.remove('bg-purple-600', 'text-white', 'active');
+                btn.classList.add('bg-slate-900', 'text-gray-400');
+            });
+
+            const botaoAtivo = window.event.currentTarget;
+            botaoAtivo.classList.remove('bg-slate-900', 'text-gray-400');
+            botaoAtivo.classList.add('bg-purple-600', 'text-white', 'active');
+
+            const cards = document.querySelectorAll('.product-card');
+            cards.forEach(card => {
+                if (categoria === 'todos' || card.getAttribute('data-category') === categoria) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            document.getElementById('campoBusca').value = '';
+        }
+
+        // Filtro em tempo real
+        function filtrarCatalogo() {
+            const input = document.getElementById('campoBusca').value.toLowerCase();
+            const cards = document.querySelectorAll('.product-card');
+            cards.forEach(card => {
+                const nomeProduto = card.getAttribute('data-name');
+                card.style.display = nomeProduto.includes(input) ? 'flex' : 'none';
+            });
+        }
+
+        function toggleFaq(elemento) {
+            const icone = elemento.querySelector('i');
+            const painel = elemento.nextElementSibling;
+            icone.classList.toggle('rotate-180');
+            painel.style.maxHeight = (painel.style.maxHeight && painel.style.maxHeight !== '0px') ? '0px' : painel.scrollHeight + 'px';
+        }
+
+        // Atalhos globais do teclado
+        window.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                fecharModalAtendente();
+                fecharModalFeedback();
+                document.getElementById('sidebarCarrinho').classList.add('translate-x-full');
+                document.getElementById('menuHamburguer').classList.add('translate-x-full');
+            }
+        });
+    </script>
+</body>
+</html>
